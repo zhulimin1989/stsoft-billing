@@ -1,0 +1,3 @@
+-- Standalone because CREATE INDEX CONCURRENTLY cannot run in a transaction.
+CREATE INDEX CONCURRENTLY "balance_transactions_account_created_id_idx"
+  ON "balance_transactions"("billing_account_id", "created_at", "id");

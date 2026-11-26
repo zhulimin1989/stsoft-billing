@@ -1,0 +1,67 @@
+name: Publisher Contracts
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/publisher-contracts.yml"
+      - ".github/workflows/capability-axis-freeze.yml"
+      - "apps/api/scripts/check-publisher-contracts-package.mjs"
+      - "apps/api/src/publisher/**"
+      - "apps/api/src/channel/model-configs.ts"
+      - "apps/api/prisma/schema.prisma"
+      - "scripts/check-capability-axis-freeze.mjs"
+      - "scripts/capability-axis-freeze.baseline.json"
+      - "apps/api/package.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  push:
+    branches:
+      - main
+      - test
+    paths:
+      - ".github/workflows/publisher-contracts.yml"
+      - ".github/workflows/capability-axis-freeze.yml"
+      - "apps/api/scripts/check-publisher-contracts-package.mjs"
+      - "apps/api/src/publisher/**"
+      - "apps/api/src/channel/model-configs.ts"
+      - "apps/api/prisma/schema.prisma"
+      - "scripts/check-capability-axis-freeze.mjs"
+      - "scripts/capability-axis-freeze.baseline.json"
+      - "apps/api/package.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  check-contracts:
+    name: Check contracts package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Publisher contracts package
+        run: pnpm publisher:check-contracts
+
+      - name: Check capability axis freeze
+        run: pnpm capability-axis-freeze:check

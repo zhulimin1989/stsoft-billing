@@ -1,0 +1,8 @@
+# syntax=docker/dockerfile:1.7
+ARG SOURCE_IMAGE
+FROM ${SOURCE_IMAGE} AS source
+
+FROM busybox:1.36
+COPY --from=source /app/apps/api/dist /payload/api-dist
+COPY --from=source /app/node_modules/.pnpm/@prisma+client@6.19.2_prisma@6.19.2_typescript@5.9.3__typescript@5.9.3/node_modules/.prisma/client /payload/prisma-client
+CMD ["sh", "-c", "cp -a /payload/. /work/"]

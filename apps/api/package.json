@@ -1,0 +1,218 @@
+{
+  "name": "@ruidong/api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "nest build --path tsconfig.build.json && node scripts/check-build-artifacts.mjs",
+    "dev": "nest start --watch",
+    "dev:billing": "nest start --watch",
+    "dev:openapi": "nest start --watch --entryFile openapi-main",
+    "start": "node dist/billing-main",
+    "start:billing": "node dist/billing-main",
+    "start:openapi": "node dist/openapi-main",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/billing-main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:balance-ledger:integration": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; test -n \"$TEST_DATABASE_NAME\" || { echo \"TEST_DATABASE_NAME is required\" >&2; exit 1; }; RUIDONG_SERVICE=billing DATABASE_URL=\"$BILLING_DATABASE_URL\" TEST_INTEGRATION=1 jest --runInBand --testPathPattern=\"balance-grant-concurrency.integration|balance-ledger-repair-set-based.integration|refund-compensation-e2e.integration|gateway-settlement-terminal-proof.integration|publisher-pending-admission.integration\"'",
+    "test:balance-ledger:pg18-recovery": "node scripts/test-balance-ledger-pg18-recovery.mjs",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:billing": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" prisma migrate deploy'",
+    "prisma:migrate:prod": "pnpm prisma:migrate:billing",
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "channel:backfill-gateway-secrets": "ts-node scripts/backfill-channel-api-keys-to-gateway.ts",
+    "coding-plan:migrate-resale-routes": "ts-node scripts/migrate-coding-plan-resale-routes.ts",
+    "quota:audit-window-monthly-consistency": "ts-node scripts/audit-quota-window-monthly-consistency.ts",
+    "tokenplan:migrate-0729-x50": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" ts-node scripts/migrate-tokenplan-0729-x50-balances.ts \"$@\"' --",
+    "credit:backfill-balance-state": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" ts-node scripts/backfill-credit-balance-states.ts'",
+    "balance:reconcile-ledger": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" ts-node scripts/reconcile-personal-balance-ledger.ts \"$@\"' --",
+    "balance:reconcile-ledger:hk-uat-two-account": "pnpm balance:reconcile-ledger --maintenance-profile hk-uat-two-account-20260722",
+    "balance:reconcile-ledger:hk-uat-remaining-account": "pnpm balance:reconcile-ledger --maintenance-profile hk-uat-remaining-account-20260722",
+    "balance:reconcile-personal-ledger": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" ts-node scripts/reconcile-personal-balance-ledger.ts --account-type personal \"$@\"' --",
+    "balance:reconcile-enterprise-absorb-ledger": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; DATABASE_URL=\"$BILLING_DATABASE_URL\" ts-node scripts/reconcile-enterprise-absorb-ledger.ts \"$@\"' --",
+    "publisher:check-contracts": "node scripts/check-publisher-contracts-package.mjs",
+    "publisher:intent-it": "ts-node scripts/publisher-runtime-intent-it.ts",
+    "publisher:account-readiness": "ts-node scripts/check-provider-account-identity-readiness.ts",
+    "provider-accounts:backfill": "sh -c 'test -n \"$BILLING_DATABASE_URL\" || { echo \"BILLING_DATABASE_URL is required\" >&2; exit 1; }; ts-node scripts/backfill-provider-account-identities.ts \"$@\"' --",
+    "prisma:studio": "prisma studio",
+    "prisma:studio:billing": "sh -c 'DATABASE_URL=\"${BILLING_DATABASE_URL:-$DATABASE_URL}\" prisma studio'",
+    "prisma:generate": "prisma generate",
+    "openapi:generate": "ts-node scripts/generate-openapi.ts",
+    "openapi:check": "ts-node scripts/generate-openapi.ts --check",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@alicloud/kms20160120": "2.4.0",
+    "@asteasolutions/zod-to-openapi": "7.3.4",
+    "@aws-sdk/client-kms": "^3.1050.0",
+    "@aws-sdk/client-s3": "^3.1075.0",
+    "@aws-sdk/s3-request-presigner": "^3.1075.0",
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^9.0.0",
+    "@nestjs/bullmq": "^11.0.4",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/event-emitter": "^3.0.1",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-fastify": "^11.0.0",
+    "@nestjs/swagger": "^11.2.6",
+    "@prisma/client": "^6.0.0",
+    "@raytone-lab/publisher-contracts": "file:../../vendor/raytone-lab-publisher-contracts-3.4.0.tgz",
+    "@ruidong/shared": "workspace:*",
+    "@sentry/nestjs": "^10.49.0",
+    "@sentry/profiling-node": "^10.49.0",
+    "ali-oss": "^6.23.0",
+    "alipay-sdk": "^4.14.0",
+    "bullmq": "^5.74.1",
+    "exceljs": "4.4.0",
+    "fastify": "^5.0.0",
+    "fastify-raw-body": "^5.0.0",
+    "geoip-lite": "1.4.10",
+    "ioredis": "^5.10.1",
+    "jszip": "^3.10.1",
+    "kafkajs": "^2.2.4",
+    "kafkajs-snappy": "1.1.0",
+    "nestjs-pino": "^4.6.1",
+    "pino-http": "^11.0.0",
+    "prom-client": "^15.1.3",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0",
+    "stripe": "^22.0.0",
+    "wechatpay-node-v3": "^2.2.1",
+    "zod": "^3.24.0"
+  },
+  "jest": {
+    "workerIdleMemoryLimit": "1536MB",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "commonjs",
+            "moduleResolution": "node",
+            "allowJs": true,
+            "esModuleInterop": true,
+            "emitDecoratorMetadata": true,
+            "experimentalDecorators": true
+          }
+        }
+      ]
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s",
+      "!**/*.spec.ts",
+      "!**/*.dto.ts",
+      "!**/main.ts",
+      "!**/*.module.ts",
+      "!**/index.ts"
+    ],
+    "coverageDirectory": "../coverage",
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "json-summary",
+      "lcov"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 45,
+        "functions": 30,
+        "lines": 48,
+        "statements": 48
+      },
+      "src/apikey/apikey.service.ts": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/billing/billing.service.ts": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/payment/payment.service.ts": {
+        "branches": 79,
+        "functions": 70,
+        "lines": 89,
+        "statements": 88
+      },
+      "src/payment/wechat-pay.service.ts": {
+        "branches": 85,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/payment/alipay.service.ts": {
+        "branches": 95,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/payment/stripe.service.ts": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/integration/webhook/webhook.service.ts": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      },
+      "src/common/utils/hmac.util.ts": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 95,
+        "statements": 95
+      },
+      "src/common/utils/url-guard.util.ts": {
+        "branches": 95,
+        "functions": 100,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@ruidong/shared$": "<rootDir>/../../../packages/shared/src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.0",
+    "@types/ali-oss": "^6.23.3",
+    "@types/ioredis": "^5.0.0",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "pino-pretty": "^13.1.3",
+    "prisma": "^6.0.0",
+    "source-map-support": "^0.5.21",
+    "ts-jest": "^29.2.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.7.0"
+  }
+}

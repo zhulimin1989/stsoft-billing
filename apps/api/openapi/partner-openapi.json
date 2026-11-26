@@ -1,0 +1,6065 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Codesphere Partner OpenAPI",
+    "description": "External, product-token-scoped API for catalog discovery, billing reads, payments, and SaaS provisioning.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Codesphere Platform Engineering"
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Current Partner API origin"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Product",
+      "description": "Token-derived product identity."
+    },
+    {
+      "name": "Catalog",
+      "description": "Product-scoped catalog discovery."
+    },
+    {
+      "name": "Billing",
+      "description": "Subject and product-scoped billing reads."
+    },
+    {
+      "name": "Payment",
+      "description": "Product-scoped payment order lifecycle."
+    },
+    {
+      "name": "Provisioning",
+      "description": "External SaaS subject provisioning."
+    }
+  ],
+  "components": {
+    "responses": {
+      "PartnerBadRequest": {
+        "description": "Request validation failed.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "VALIDATION_ERROR",
+                  "message": "请求参数错误",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerUnauthorized": {
+        "description": "Product integration token is missing, invalid, inactive, or revoked.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "AUTH_UNAUTHORIZED",
+                  "message": "Missing or invalid product integration token",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerForbidden": {
+        "description": "The authenticated subject is not permitted to perform this operation.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "AUTH_FORBIDDEN",
+                  "message": "无权限执行此操作",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerNotFound": {
+        "description": "The requested resource does not exist in the token-derived product scope.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "NOT_FOUND",
+                  "message": "资源不存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerConflict": {
+        "description": "The request conflicts with current state or an earlier idempotent request.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "CONFLICT",
+                  "message": "请求与当前资源状态冲突",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerPayloadTooLarge": {
+        "description": "Request body exceeds the Partner API body-size limit.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "VALIDATION_ERROR",
+                  "message": "请求体过大",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerUnsupportedMediaType": {
+        "description": "Request Content-Type is not supported by the Partner API.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "VALIDATION_ERROR",
+                  "message": "不支持的 Content-Type",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerRateLimited": {
+        "description": "Rate limit exceeded. Honor the Retry-After response header.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          },
+          "Retry-After": {
+            "description": "Seconds until the client may retry.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 60
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "RATE_LIMIT_EXCEEDED",
+                  "message": "请求过于频繁",
+                  "data": null,
+                  "statusCode": 429,
+                  "retryAfter": 60
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerInternalError": {
+        "description": "Unexpected server error.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "INTERNAL_ERROR",
+                  "message": "服务器内部错误",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerUpstreamError": {
+        "description": "An upstream provider returned an invalid or failed response.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "UPSTREAM_ERROR",
+                  "message": "上游服务响应异常",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "PartnerServiceUnavailable": {
+        "description": "A required downstream service or the shared rate-limit backend is unavailable.",
+        "headers": {
+          "Cache-Control": {
+            "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private, no-store"
+              ]
+            },
+            "example": "private, no-store"
+          },
+          "Vary": {
+            "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Authorization, x-product-token, x-billing-product-token"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PartnerErrorResponse"
+            },
+            "examples": {
+              "error": {
+                "value": {
+                  "code": "SERVICE_UNAVAILABLE",
+                  "message": "依赖服务或限流后端暂时不可用",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "partnerBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "ProductIntegrationToken",
+        "description": "Recommended: Authorization: Bearer <product_integration_token>."
+      },
+      "productToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-product-token",
+        "description": "Compatibility header carrying the product integration token."
+      },
+      "billingProductToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-billing-product-token",
+        "description": "Legacy compatibility header carrying the product integration token."
+      }
+    },
+    "schemas": {
+      "PartnerErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "Stable machine-readable error code.",
+            "example": "VALIDATION_ERROR"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message.",
+            "example": "请求参数错误"
+          },
+          "data": {
+            "nullable": true
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "HTTP status code included by transport-level errors such as rate limiting.",
+            "example": 429
+          },
+          "retryAfter": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Retry delay in seconds when the request is rate limited.",
+            "example": 60
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "billingMode": {
+            "type": "string",
+            "enum": [
+              "SUBSCRIPTION",
+              "PAY_AS_YOU_GO",
+              "CODING_PLAN"
+            ]
+          },
+          "codingPlanFulfillmentMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillmentMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultPlanId": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerPlan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "description": "Three-letter ISO 4217 currency code.",
+            "example": "usd"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "planType": {
+            "type": "string"
+          },
+          "monthlyPrice": {
+            "type": "integer"
+          },
+          "quarterlyPrice": {
+            "type": "integer"
+          },
+          "yearlyPrice": {
+            "type": "integer"
+          },
+          "billingPeriod": {
+            "type": "string"
+          },
+          "monthlyCredits": {
+            "type": "integer"
+          },
+          "creditsRollover": {
+            "type": "boolean"
+          },
+          "rolloverMaxMonths": {
+            "type": "integer"
+          },
+          "rateLimitRpm": {
+            "type": "integer"
+          },
+          "rateLimitTpm": {
+            "type": "integer"
+          },
+          "maxContextWindow": {
+            "type": "integer"
+          },
+          "quotaRules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "enum": [
+                    "REQUESTS",
+                    "INPUT_TOKENS",
+                    "OUTPUT_TOKENS",
+                    "TOTAL_TOKENS",
+                    "CREDITS"
+                  ]
+                },
+                "windowType": {
+                  "type": "string",
+                  "enum": [
+                    "ROLLING",
+                    "FIXED_PERIOD",
+                    "CUMULATIVE"
+                  ]
+                },
+                "durationSec": {
+                  "type": "integer"
+                },
+                "durationLabel": {
+                  "type": "string"
+                },
+                "limitValue": {
+                  "type": "integer"
+                },
+                "enforced": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "metric",
+                "windowType",
+                "durationSec",
+                "durationLabel",
+                "limitValue",
+                "enforced"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "overageEnabled": {
+            "type": "boolean"
+          },
+          "usageMultiplier": {
+            "type": "number"
+          },
+          "memberLimit": {
+            "type": "integer"
+          },
+          "minimumSeats": {
+            "type": "integer"
+          },
+          "dataTraining": {
+            "type": "string"
+          },
+          "supportTier": {
+            "type": "string"
+          },
+          "ssoEnabled": {
+            "type": "boolean"
+          },
+          "priorityAccess": {
+            "type": "boolean"
+          },
+          "badge": {
+            "type": "string",
+            "nullable": true
+          },
+          "trialDays": {
+            "type": "integer"
+          },
+          "validityDays": {
+            "type": "integer"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isLegacy": {
+            "type": "boolean"
+          },
+          "soldOut": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "currency",
+          "name",
+          "description",
+          "planType",
+          "monthlyPrice",
+          "quarterlyPrice",
+          "yearlyPrice",
+          "billingPeriod",
+          "monthlyCredits",
+          "creditsRollover",
+          "rolloverMaxMonths",
+          "rateLimitRpm",
+          "rateLimitTpm",
+          "maxContextWindow",
+          "overageEnabled",
+          "usageMultiplier",
+          "memberLimit",
+          "minimumSeats",
+          "dataTraining",
+          "supportTier",
+          "ssoEnabled",
+          "priorityAccess",
+          "badge",
+          "trialDays",
+          "validityDays",
+          "features",
+          "isActive",
+          "isLegacy",
+          "soldOut",
+          "sortOrder",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerBoosterPack": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "creditsAmount": {
+            "type": "integer"
+          },
+          "priceCents": {
+            "type": "integer"
+          },
+          "expiryDays": {
+            "type": "integer",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "name",
+          "description",
+          "creditsAmount",
+          "priceCents",
+          "isActive",
+          "sortOrder"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "modelType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "displayName",
+          "provider"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerModelAccess": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string"
+          },
+          "modelName": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "creditMultiplier": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Authoritative plan/model credit multiplier. 0 means no credit charge, 1 is the base rate, and values above or below 1 scale credit consumption.",
+            "example": 1.5
+          }
+        },
+        "required": [
+          "planId",
+          "modelName",
+          "isActive",
+          "creditMultiplier"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerModelRoutePolicy": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string"
+          },
+          "routeKey": {
+            "type": "string"
+          },
+          "primaryModel": {
+            "type": "string"
+          },
+          "fallbackModels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "planId",
+          "routeKey",
+          "primaryModel",
+          "fallbackModels",
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerChannel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "runtime": {
+            "type": "string"
+          },
+          "models": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "nullable": true
+              }
+            }
+          },
+          "sdkType": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "provider",
+          "runtime",
+          "models",
+          "isDefault"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCurrentSubscription": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "billingMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillmentMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "planId": {
+            "type": "string",
+            "nullable": true
+          },
+          "planName": {
+            "type": "string"
+          },
+          "billingPeriod": {
+            "type": "string",
+            "nullable": true
+          },
+          "codingPlanEntitlementId": {
+            "type": "string",
+            "nullable": true
+          },
+          "monthlyPrice": {
+            "type": "integer"
+          },
+          "monthlyCredits": {
+            "type": "integer"
+          },
+          "rateLimitRpm": {
+            "type": "integer"
+          },
+          "rateLimitTpm": {
+            "type": "integer"
+          },
+          "maxContextWindow": {
+            "type": "integer"
+          },
+          "quotaRules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "enum": [
+                    "REQUESTS",
+                    "INPUT_TOKENS",
+                    "OUTPUT_TOKENS",
+                    "TOTAL_TOKENS",
+                    "CREDITS"
+                  ]
+                },
+                "windowType": {
+                  "type": "string",
+                  "enum": [
+                    "ROLLING",
+                    "FIXED_PERIOD",
+                    "CUMULATIVE"
+                  ]
+                },
+                "durationSec": {
+                  "type": "integer"
+                },
+                "durationLabel": {
+                  "type": "string"
+                },
+                "limitValue": {
+                  "type": "integer"
+                },
+                "enforced": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "metric",
+                "windowType",
+                "durationSec",
+                "durationLabel",
+                "limitValue",
+                "enforced"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "usageWindows": {
+            "type": "object",
+            "properties": {
+              "month": {
+                "type": "object",
+                "properties": {
+                  "usedCredits": {
+                    "type": "integer"
+                  },
+                  "budgetCredits": {
+                    "type": "integer"
+                  },
+                  "resetInSec": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "usedCredits",
+                  "budgetCredits",
+                  "resetInSec"
+                ],
+                "additionalProperties": false
+              },
+              "week": {
+                "type": "object",
+                "properties": {
+                  "usedCredits": {
+                    "type": "integer"
+                  },
+                  "budgetCredits": {
+                    "type": "integer"
+                  },
+                  "resetInSec": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "usedCredits",
+                  "budgetCredits",
+                  "resetInSec"
+                ],
+                "additionalProperties": false
+              },
+              "fiveHour": {
+                "type": "object",
+                "properties": {
+                  "usedCredits": {
+                    "type": "integer"
+                  },
+                  "budgetCredits": {
+                    "type": "integer"
+                  },
+                  "resetInSec": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "usedCredits",
+                  "budgetCredits",
+                  "resetInSec"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "productId",
+          "billingMode",
+          "planId",
+          "planName",
+          "billingPeriod",
+          "monthlyPrice",
+          "monthlyCredits",
+          "rateLimitRpm",
+          "rateLimitTpm",
+          "maxContextWindow",
+          "features",
+          "status",
+          "expiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCredits": {
+        "type": "object",
+        "properties": {
+          "quotaCredits": {
+            "type": "integer"
+          },
+          "bonusCredits": {
+            "type": "integer"
+          },
+          "grantCredits": {
+            "type": "integer"
+          },
+          "totalCredits": {
+            "type": "integer"
+          },
+          "usedThisMonth": {
+            "type": "integer"
+          },
+          "usedThisCycle": {
+            "type": "integer"
+          },
+          "billingCycleStart": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "quotaCredits",
+          "bonusCredits",
+          "grantCredits",
+          "totalCredits",
+          "usedThisMonth",
+          "usedThisCycle",
+          "billingCycleStart"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCreditTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscriptionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "QUOTA_GRANT",
+              "QUOTA_RESET",
+              "BONUS_PURCHASE",
+              "CONSUME",
+              "REFUND",
+              "GRANT",
+              "EXPIRE"
+            ]
+          },
+          "creditsAmount": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string"
+          },
+          "quotaAfter": {
+            "type": "integer"
+          },
+          "bonusAfter": {
+            "type": "integer"
+          },
+          "balanceAfter": {
+            "type": "integer"
+          },
+          "inputTokens": {
+            "type": "integer"
+          },
+          "cachedInputTokens": {
+            "type": "integer"
+          },
+          "outputTokens": {
+            "type": "integer"
+          },
+          "totalTokens": {
+            "type": "integer"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "type",
+          "creditsAmount",
+          "source",
+          "quotaAfter",
+          "bonusAfter",
+          "balanceAfter",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerBalanceTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECHARGE",
+              "CONSUME",
+              "ADJUST",
+              "REFUND"
+            ]
+          },
+          "amountCents": {
+            "type": "integer"
+          },
+          "balanceAfterCents": {
+            "type": "integer"
+          },
+          "amountUsd": {
+            "type": "number"
+          },
+          "balanceAfterUsd": {
+            "type": "number"
+          },
+          "tokenUsageId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "type",
+          "amountCents",
+          "balanceAfterCents",
+          "description",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "SUBSCRIPTION",
+              "BOOSTER_PACK",
+              "RECHARGE",
+              "BUNDLE"
+            ]
+          },
+          "bundleSkuId": {
+            "type": "string",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "planId": {
+            "type": "string",
+            "nullable": true
+          },
+          "boosterPackId": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountCents": {
+            "type": "integer"
+          },
+          "rechargeTierId": {
+            "type": "string",
+            "nullable": true
+          },
+          "bonusCents": {
+            "type": "integer"
+          },
+          "totalGrantedCents": {
+            "type": "integer"
+          },
+          "billingPeriod": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          },
+          "prorationCreditCents": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "FULFILLING",
+              "PARTIALLY_FULFILLED_REQUIRES_COMPENSATION",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED",
+              "FAILED",
+              "REFUNDING",
+              "REFUNDED",
+              "REFUND_FAILED",
+              "REFUND_COMPENSATION_FAILED"
+            ]
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "WECHAT",
+              "ALIPAY",
+              "STRIPE",
+              "BALANCE"
+            ]
+          },
+          "tradeNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "paidAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "refundedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "refundReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "orderType",
+          "planId",
+          "boosterPackId",
+          "amountCents",
+          "status",
+          "channel",
+          "tradeNo",
+          "paidAt",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerApiEndpoints": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string"
+          },
+          "currentProduct": {
+            "type": "string"
+          },
+          "provision": {
+            "type": "string"
+          },
+          "catalog": {
+            "type": "string"
+          },
+          "products": {
+            "type": "string"
+          },
+          "plans": {
+            "type": "string"
+          },
+          "boosterPacks": {
+            "type": "string"
+          },
+          "models": {
+            "type": "string"
+          },
+          "modelAccess": {
+            "type": "string"
+          },
+          "modelRoutePolicies": {
+            "type": "string"
+          },
+          "channels": {
+            "type": "string"
+          },
+          "paymentCreate": {
+            "type": "string"
+          },
+          "paymentOrders": {
+            "type": "string"
+          },
+          "paymentOrderStatus": {
+            "type": "string"
+          },
+          "paymentOrder": {
+            "type": "string"
+          },
+          "paymentMethods": {
+            "type": "string"
+          },
+          "billingCurrentSubscription": {
+            "type": "string"
+          },
+          "billingCredits": {
+            "type": "string"
+          },
+          "billingCreditsSummary": {
+            "type": "string"
+          },
+          "billingCreditTransactions": {
+            "type": "string"
+          },
+          "billingTransactions": {
+            "type": "string"
+          },
+          "billingDailySummary": {
+            "type": "string"
+          },
+          "billingMonthlySummary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "base",
+          "currentProduct",
+          "provision",
+          "catalog",
+          "products",
+          "plans",
+          "boosterPacks",
+          "models",
+          "modelAccess",
+          "modelRoutePolicies",
+          "channels",
+          "paymentCreate",
+          "paymentOrders",
+          "paymentOrderStatus",
+          "paymentOrder",
+          "paymentMethods",
+          "billingCurrentSubscription",
+          "billingCredits",
+          "billingCreditsSummary",
+          "billingCreditTransactions",
+          "billingTransactions",
+          "billingDailySummary",
+          "billingMonthlySummary"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCurrentProduct": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "productSlug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "billingMode": {
+            "type": "string",
+            "enum": [
+              "SUBSCRIPTION",
+              "PAY_AS_YOU_GO",
+              "CODING_PLAN"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "defaultPlanId": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasWebhookUrl": {
+            "type": "boolean"
+          },
+          "endpoints": {
+            "$ref": "#/components/schemas/PartnerApiEndpoints"
+          }
+        },
+        "required": [
+          "productId",
+          "productSlug",
+          "name",
+          "billingMode",
+          "isActive",
+          "defaultPlanId",
+          "hasWebhookUrl",
+          "endpoints"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCatalog": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProduct"
+            }
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerPlan"
+            }
+          },
+          "boosterPacks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerBoosterPack"
+            }
+          },
+          "models": {
+            "type": "object",
+            "properties": {
+              "models": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModel"
+                }
+              }
+            },
+            "required": [
+              "models"
+            ],
+            "additionalProperties": false
+          },
+          "modelAccess": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModelAccess"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "modelRoutePolicies": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModelRoutePolicy"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "channels": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerChannel"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "products",
+          "plans",
+          "boosterPacks",
+          "models",
+          "modelAccess",
+          "modelRoutePolicies",
+          "channels"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCreditsSummary": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "productSlug": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/PartnerCurrentSubscription"
+          },
+          "credits": {
+            "$ref": "#/components/schemas/PartnerCredits"
+          },
+          "quotaCredits": {
+            "type": "integer"
+          },
+          "bonusCredits": {
+            "type": "integer"
+          },
+          "grantCredits": {
+            "type": "integer"
+          },
+          "totalCredits": {
+            "type": "integer"
+          },
+          "usedThisMonth": {
+            "type": "integer"
+          },
+          "usedThisCycle": {
+            "type": "integer"
+          },
+          "billingCycleStart": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "productId",
+          "productSlug",
+          "userId",
+          "tenantId",
+          "subscription",
+          "credits",
+          "quotaCredits",
+          "bonusCredits",
+          "grantCredits",
+          "totalCredits",
+          "usedThisMonth",
+          "usedThisCycle",
+          "billingCycleStart"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerDailySummaryItem": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "UTC calendar-date bucket.",
+            "example": "2026-07-23"
+          },
+          "balanceConsumptionCents": {
+            "type": "integer"
+          },
+          "creditConsumption": {
+            "type": "integer"
+          },
+          "tokenCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "balanceConsumptionCents",
+          "creditConsumption",
+          "tokenCount"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerMonthlySummaryItem": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$",
+            "description": "UTC calendar-month bucket.",
+            "example": "2026-07"
+          },
+          "balanceConsumeCents": {
+            "type": "integer"
+          },
+          "balanceRechargeCents": {
+            "type": "integer"
+          },
+          "creditConsume": {
+            "type": "integer"
+          },
+          "creditGrant": {
+            "type": "integer"
+          },
+          "creditBonus": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "month",
+          "balanceConsumeCents",
+          "balanceRechargeCents",
+          "creditConsume",
+          "creditGrant",
+          "creditBonus"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerPaymentMethods": {
+        "type": "object",
+        "properties": {
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "channel": {
+                  "type": "string",
+                  "enum": [
+                    "WECHAT",
+                    "ALIPAY",
+                    "STRIPE"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "qr",
+                    "redirect"
+                  ]
+                }
+              },
+              "required": [
+                "channel",
+                "label",
+                "currency",
+                "mode"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "methods"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerProvisionResult": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true,
+            "description": "External tenant id supplied by the caller, or null for a self-operated CODING_PLAN user-only request."
+          },
+          "productId": {
+            "type": "string"
+          },
+          "productSlug": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "plainKey": {
+                "type": "string",
+                "nullable": true,
+                "description": "Recoverable key secret. It can be returned on exact idempotent replays only during the 15-minute encrypted recovery window; afterward it is null."
+              },
+              "created": {
+                "type": "boolean",
+                "description": "Whether the original durable provision operation created this key."
+              },
+              "rotated": {
+                "type": "boolean",
+                "description": "Whether the original durable provision operation rotated a predecessor."
+              }
+            },
+            "required": [
+              "id",
+              "prefix",
+              "plainKey",
+              "created",
+              "rotated"
+            ],
+            "additionalProperties": false
+          },
+          "subscription": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "planId": {
+                "type": "string"
+              },
+              "created": {
+                "type": "boolean",
+                "description": "Whether the original durable provision operation created this subscription."
+              }
+            },
+            "required": [
+              "id",
+              "planId",
+              "created"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "userId",
+          "tenantId",
+          "productId",
+          "productSlug",
+          "apiKey",
+          "subscription"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCreateOrderResult": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/PartnerOrder"
+          },
+          "payUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          }
+        },
+        "required": [
+          "order",
+          "payUrl"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerOrderStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "FULFILLING",
+              "PARTIALLY_FULFILLED_REQUIRES_COMPENSATION",
+              "COMPLETED",
+              "EXPIRED",
+              "CANCELLED",
+              "FAILED",
+              "REFUNDING",
+              "REFUNDED",
+              "REFUND_FAILED",
+              "REFUND_COMPENSATION_FAILED"
+            ]
+          },
+          "paidAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "cancelReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "status",
+          "paidAt",
+          "cancelReason"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetCurrentProductResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCurrentProduct"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetCatalogResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCatalog"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetProductsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProduct"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetPlansResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerPlan"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBoosterPacksResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerBoosterPack"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetModelsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "models": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModel"
+                }
+              }
+            },
+            "required": [
+              "models"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetModelAccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModelAccess"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetModelRoutePoliciesResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerModelRoutePolicy"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetChannelsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerChannel"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingCurrentSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCurrentSubscription"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingCreditsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCredits"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingCreditsSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCreditsSummary"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingCreditTransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerCreditTransaction"
+                }
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "pageSize": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "totalPages": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "items",
+              "total",
+              "page",
+              "pageSize",
+              "totalPages"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingTransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerBalanceTransaction"
+                }
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "pageSize": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "totalPages": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "items",
+              "total",
+              "page",
+              "pageSize",
+              "totalPages"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingDailySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDailySummaryItem"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetBillingMonthlySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerMonthlySummaryItem"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerCreatePaymentOrderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerCreateOrderResult"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetPaymentOrdersResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartnerOrder"
+                }
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "pageSize": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "totalPages": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "items",
+              "total",
+              "page",
+              "pageSize",
+              "totalPages"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetPaymentOrderStatusResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerOrderStatus"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetPaymentOrderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerOrder"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerGetPaymentMethodsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerPaymentMethods"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "PartnerProvisionResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "example": "ok"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PartnerProvisionResult"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "data"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/partner/v1/product/current": {
+      "get": {
+        "operationId": "partnerGetCurrentProduct",
+        "summary": "Get the token-derived product",
+        "description": "Returns the active product represented by the integration token and its Partner API endpoint map.",
+        "tags": [
+          "Product"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current product metadata.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetCurrentProductResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "productId": "prod-123",
+                        "productSlug": "example-product",
+                        "name": "Example Product",
+                        "billingMode": "SUBSCRIPTION",
+                        "isActive": true,
+                        "defaultPlanId": "plan-pro",
+                        "hasWebhookUrl": true,
+                        "endpoints": {
+                          "base": "/partner/v1",
+                          "currentProduct": "/partner/v1/product/current",
+                          "provision": "/partner/v1/tenants/provision",
+                          "catalog": "/partner/v1/catalog",
+                          "products": "/partner/v1/catalog/products",
+                          "plans": "/partner/v1/catalog/plans",
+                          "boosterPacks": "/partner/v1/catalog/booster-packs",
+                          "models": "/partner/v1/catalog/models",
+                          "modelAccess": "/partner/v1/catalog/model-access",
+                          "modelRoutePolicies": "/partner/v1/catalog/model-route-policies",
+                          "channels": "/partner/v1/catalog/channels",
+                          "paymentCreate": "/partner/v1/payment/create",
+                          "paymentOrders": "/partner/v1/payment/orders",
+                          "paymentOrderStatus": "/partner/v1/payment/orders/{id}/status",
+                          "paymentOrder": "/partner/v1/payment/orders/{id}",
+                          "paymentMethods": "/partner/v1/payment/methods",
+                          "billingCurrentSubscription": "/partner/v1/billing/current-subscription",
+                          "billingCredits": "/partner/v1/billing/credits",
+                          "billingCreditsSummary": "/partner/v1/billing/credits-summary",
+                          "billingCreditTransactions": "/partner/v1/billing/credit-transactions",
+                          "billingTransactions": "/partner/v1/billing/transactions",
+                          "billingDailySummary": "/partner/v1/billing/daily-summary",
+                          "billingMonthlySummary": "/partner/v1/billing/monthly-summary"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog": {
+      "get": {
+        "operationId": "partnerGetCatalog",
+        "summary": "Get the complete product catalog",
+        "description": "Returns the product-scoped aggregate catalog represented by the integration token.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product catalog aggregate.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetCatalogResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "products": [
+                          {
+                            "id": "prod-123",
+                            "slug": "example-product",
+                            "name": "Example Product",
+                            "description": "Example external SaaS product",
+                            "icon": null,
+                            "billingMode": "SUBSCRIPTION",
+                            "defaultPlanId": "plan-pro",
+                            "isActive": true,
+                            "sortOrder": 10
+                          }
+                        ],
+                        "plans": [
+                          {
+                            "id": "plan-pro",
+                            "productId": "prod-123",
+                            "currency": "usd",
+                            "name": "Pro",
+                            "description": "Professional plan",
+                            "planType": "individual",
+                            "monthlyPrice": 1999,
+                            "quarterlyPrice": 1799,
+                            "yearlyPrice": 1599,
+                            "billingPeriod": "monthly",
+                            "monthlyCredits": 100000,
+                            "creditsRollover": false,
+                            "rolloverMaxMonths": 0,
+                            "rateLimitRpm": 60,
+                            "rateLimitTpm": 100000,
+                            "maxContextWindow": 200000,
+                            "overageEnabled": false,
+                            "usageMultiplier": 1,
+                            "memberLimit": 1,
+                            "minimumSeats": 1,
+                            "dataTraining": "never",
+                            "supportTier": "priority",
+                            "ssoEnabled": false,
+                            "priorityAccess": true,
+                            "badge": "Popular",
+                            "trialDays": 0,
+                            "validityDays": 30,
+                            "features": [
+                              "priority"
+                            ],
+                            "isActive": true,
+                            "isLegacy": false,
+                            "soldOut": false,
+                            "sortOrder": 10,
+                            "createdAt": "2026-07-01T00:00:00.000Z",
+                            "updatedAt": "2026-07-23T00:00:00.000Z"
+                          }
+                        ],
+                        "boosterPacks": [],
+                        "models": {
+                          "models": []
+                        },
+                        "modelAccess": {
+                          "items": []
+                        },
+                        "modelRoutePolicies": {
+                          "items": []
+                        },
+                        "channels": {
+                          "items": []
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/products": {
+      "get": {
+        "operationId": "partnerListProducts",
+        "summary": "List visible products",
+        "description": "Returns the product represented by the integration token.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Visible products.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetProductsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": [
+                        {
+                          "id": "prod-123",
+                          "slug": "example-product",
+                          "name": "Example Product",
+                          "description": "Example external SaaS product",
+                          "icon": null,
+                          "billingMode": "SUBSCRIPTION",
+                          "defaultPlanId": "plan-pro",
+                          "isActive": true,
+                          "sortOrder": 10
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/plans": {
+      "get": {
+        "operationId": "partnerListPlans",
+        "summary": "List product plans",
+        "description": "Returns active plans belonging to the token-derived product, priced from active PlanPrice rows for the platform currency with the same legacy fallback used by checkout.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active product plans.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetPlansResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": [
+                        {
+                          "id": "plan-pro",
+                          "productId": "prod-123",
+                          "currency": "usd",
+                          "name": "Pro",
+                          "description": "Professional plan",
+                          "planType": "individual",
+                          "monthlyPrice": 1999,
+                          "quarterlyPrice": 1799,
+                          "yearlyPrice": 1599,
+                          "billingPeriod": "monthly",
+                          "monthlyCredits": 100000,
+                          "creditsRollover": false,
+                          "rolloverMaxMonths": 0,
+                          "rateLimitRpm": 60,
+                          "rateLimitTpm": 100000,
+                          "maxContextWindow": 200000,
+                          "overageEnabled": false,
+                          "usageMultiplier": 1,
+                          "memberLimit": 1,
+                          "minimumSeats": 1,
+                          "dataTraining": "never",
+                          "supportTier": "priority",
+                          "ssoEnabled": false,
+                          "priorityAccess": true,
+                          "badge": "Popular",
+                          "trialDays": 0,
+                          "validityDays": 30,
+                          "features": [
+                            "priority"
+                          ],
+                          "isActive": true,
+                          "isLegacy": false,
+                          "soldOut": false,
+                          "sortOrder": 10,
+                          "createdAt": "2026-07-01T00:00:00.000Z",
+                          "updatedAt": "2026-07-23T00:00:00.000Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/booster-packs": {
+      "get": {
+        "operationId": "partnerListBoosterPacks",
+        "summary": "List product booster packs",
+        "description": "Returns active booster packs belonging to the token-derived product.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active booster packs.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBoosterPacksResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": [
+                        {
+                          "id": "booster-123",
+                          "productId": "prod-123",
+                          "name": "10K Credits",
+                          "description": "One-time credit add-on",
+                          "creditsAmount": 10000,
+                          "priceCents": 999,
+                          "isActive": true,
+                          "sortOrder": 10
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/models": {
+      "get": {
+        "operationId": "partnerListModels",
+        "summary": "List product-visible models",
+        "description": "Returns models visible through the token-derived product catalog.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Visible model catalog.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetModelsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "models": [
+                          {
+                            "id": "gpt-4.1",
+                            "displayName": "gpt-4.1",
+                            "provider": "openai",
+                            "modelType": "chat"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/model-access": {
+      "get": {
+        "operationId": "partnerListModelAccess",
+        "summary": "List plan model access",
+        "description": "Returns model access rules for plans in the token-derived product.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plan model access rules.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetModelAccessResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "planId": "plan-pro",
+                            "modelName": "gpt-4.1",
+                            "isActive": true,
+                            "creditMultiplier": 1.5
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/model-route-policies": {
+      "get": {
+        "operationId": "partnerListModelRoutePolicies",
+        "summary": "List model route policies",
+        "description": "Returns active model routing policies for plans in the token-derived product.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product model route policies.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetModelRoutePoliciesResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "planId": "plan-pro",
+                            "routeKey": "default",
+                            "primaryModel": "gpt-4.1",
+                            "fallbackModels": [
+                              "gpt-4.1-mini"
+                            ],
+                            "isActive": true
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/catalog/channels": {
+      "get": {
+        "operationId": "partnerListChannels",
+        "summary": "List product-visible runtime channels",
+        "description": "Returns the sanitized runtime channel view available to the token-derived product.",
+        "tags": [
+          "Catalog"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sanitized product channel catalog.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetChannelsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "id": "channel-123",
+                            "name": "Primary OpenAI",
+                            "provider": "openai",
+                            "runtime": "gateway",
+                            "models": {
+                              "gpt-4.1": {
+                                "context_window": 200000
+                              }
+                            },
+                            "sdkType": "openai",
+                            "isDefault": true
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/current-subscription": {
+      "get": {
+        "operationId": "partnerGetCurrentSubscription",
+        "summary": "Get current subscription",
+        "description": "Returns the subject subscription for the token-derived product.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current subscription.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingCurrentSubscriptionResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "productId": "prod-123",
+                        "billingMode": "SUBSCRIPTION",
+                        "fulfillmentMode": null,
+                        "planId": "plan-pro",
+                        "planName": "Pro",
+                        "billingPeriod": "monthly",
+                        "monthlyPrice": 1999,
+                        "monthlyCredits": 100000,
+                        "rateLimitRpm": 60,
+                        "rateLimitTpm": 100000,
+                        "maxContextWindow": 200000,
+                        "features": [
+                          "priority"
+                        ],
+                        "status": "active",
+                        "expiresAt": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/credits": {
+      "get": {
+        "operationId": "partnerGetCredits",
+        "summary": "Get credit balances",
+        "description": "Returns current product credit pools for the resolved billing subject.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "Optional CodingPlan entitlement. It must belong to the token-derived product and subject.",
+              "example": "entitlement-123"
+            },
+            "required": false,
+            "name": "entitlementId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit balances.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingCreditsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "quotaCredits": 80000,
+                        "bonusCredits": 10000,
+                        "grantCredits": 5000,
+                        "totalCredits": 95000,
+                        "usedThisMonth": 15000,
+                        "usedThisCycle": 15000,
+                        "billingCycleStart": "2026-07-01T00:00:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/credits-summary": {
+      "get": {
+        "operationId": "partnerGetCreditsSummary",
+        "summary": "Get subscription and credit summary",
+        "description": "Returns subscription and credit data together. Credit fields are also mirrored at data top level for compatibility.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription and credit summary.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingCreditsSummaryResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "productId": "prod-123",
+                        "productSlug": "example-product",
+                        "userId": "user-123",
+                        "tenantId": "tenant-123",
+                        "subscription": {
+                          "productId": "prod-123",
+                          "billingMode": "SUBSCRIPTION",
+                          "fulfillmentMode": null,
+                          "planId": "plan-pro",
+                          "planName": "Pro",
+                          "billingPeriod": "monthly",
+                          "monthlyPrice": 1999,
+                          "monthlyCredits": 100000,
+                          "rateLimitRpm": 60,
+                          "rateLimitTpm": 100000,
+                          "maxContextWindow": 200000,
+                          "features": [
+                            "priority"
+                          ],
+                          "status": "active",
+                          "expiresAt": null
+                        },
+                        "credits": {
+                          "quotaCredits": 80000,
+                          "bonusCredits": 10000,
+                          "grantCredits": 5000,
+                          "totalCredits": 95000,
+                          "usedThisMonth": 15000,
+                          "usedThisCycle": 15000,
+                          "billingCycleStart": "2026-07-01T00:00:00.000Z"
+                        },
+                        "quotaCredits": 80000,
+                        "bonusCredits": 10000,
+                        "grantCredits": 5000,
+                        "totalCredits": 95000,
+                        "usedThisMonth": 15000,
+                        "usedThisCycle": 15000,
+                        "billingCycleStart": "2026-07-01T00:00:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/credit-transactions": {
+      "get": {
+        "operationId": "partnerListCreditTransactions",
+        "summary": "List credit transactions",
+        "description": "Returns paginated credit ledger entries in the token-derived product scope. For a team subject, the ledger covers the team rather than filtering to the query user. Response userId is the actual actor mapped through the current product namespace, or null when no safe external mapping exists.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "One-based page number.",
+              "example": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Number of records per page, at most 100.",
+              "example": 20
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "Optional CodingPlan entitlement. It must belong to the token-derived product and subject.",
+              "example": "entitlement-123"
+            },
+            "required": false,
+            "name": "entitlementId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated credit transactions.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingCreditTransactionsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "id": "credit-tx-123",
+                            "userId": "user-123",
+                            "tenantId": "tenant-123",
+                            "productId": "prod-123",
+                            "subscriptionId": "subscription-123",
+                            "type": "CONSUME",
+                            "creditsAmount": -150,
+                            "source": "chat:gpt-4.1",
+                            "quotaAfter": 80000,
+                            "bonusAfter": 10000,
+                            "balanceAfter": 90000,
+                            "totalTokens": 1200,
+                            "requestId": "request-123",
+                            "createdAt": "2026-07-23T08:00:00.000Z"
+                          }
+                        ],
+                        "total": 1,
+                        "page": 1,
+                        "pageSize": 20,
+                        "totalPages": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/transactions": {
+      "get": {
+        "operationId": "partnerListBalanceTransactions",
+        "summary": "List balance transactions",
+        "description": "Returns paginated money/balance ledger entries in the token-derived product scope. For a team subject, the ledger covers the team rather than filtering to the query user. Response userId is the actual actor mapped through the current product namespace, or null when no safe external mapping exists.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "One-based page number.",
+              "example": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Number of records per page, at most 100.",
+              "example": 20
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated balance transactions.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingTransactionsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "id": "balance-tx-123",
+                            "userId": "user-123",
+                            "tenantId": "tenant-123",
+                            "productId": "prod-123",
+                            "type": "RECHARGE",
+                            "amountCents": 5000,
+                            "balanceAfterCents": 10000,
+                            "amountUsd": 50,
+                            "balanceAfterUsd": 100,
+                            "description": "Stripe recharge",
+                            "createdAt": "2026-07-23T08:00:00.000Z"
+                          }
+                        ],
+                        "total": 1,
+                        "page": 1,
+                        "pageSize": 20,
+                        "totalPages": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/daily-summary": {
+      "get": {
+        "operationId": "partnerGetDailyBillingSummary",
+        "summary": "Get daily billing summary",
+        "description": "Returns daily balance, credit, and token consumption using UTC calendar-day boundaries. The range is inclusive: startDate begins at 00:00:00Z and endDate ends immediately before the next 00:00:00Z.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Inclusive UTC calendar date in YYYY-MM-DD form.",
+              "example": "2026-07-01"
+            },
+            "required": true,
+            "name": "startDate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Inclusive UTC calendar date in YYYY-MM-DD form.",
+              "example": "2026-07-31"
+            },
+            "required": true,
+            "name": "endDate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "Optional API key filter.",
+              "example": "key-123"
+            },
+            "required": false,
+            "name": "apiKeyId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daily billing summary.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingDailySummaryResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": [
+                        {
+                          "date": "2026-07-23",
+                          "balanceConsumptionCents": 25,
+                          "creditConsumption": 150,
+                          "tokenCount": 1200
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/billing/monthly-summary": {
+      "get": {
+        "operationId": "partnerGetMonthlyBillingSummary",
+        "summary": "Get monthly billing summary",
+        "description": "Returns monthly balance and credit totals for one UTC calendar year; month buckets change at 00:00:00Z on the first day of each month.",
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^(20[2-9]\\d|2100)$",
+              "description": "UTC calendar year from 2020 through 2100.",
+              "example": "2026"
+            },
+            "required": true,
+            "name": "year",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monthly billing summary.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetBillingMonthlySummaryResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": [
+                        {
+                          "month": "2026-07",
+                          "balanceConsumeCents": 2500,
+                          "balanceRechargeCents": 5000,
+                          "creditConsume": 15000,
+                          "creditGrant": 100000,
+                          "creditBonus": 10000
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/payment/create": {
+      "post": {
+        "operationId": "partnerCreatePaymentOrder",
+        "summary": "Create a payment order",
+        "description": "Creates a product-scoped order and returns the provider payment URL when applicable. tenantId is required for every product because purchase eligibility is verified against external tenant membership.",
+        "tags": [
+          "Payment"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Order creation input. Product identity is always derived from the integration token. tenantId is always required for user-api purchase-eligibility verification.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "userId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+                        "description": "External SaaS user identifier mirrored into Billing.",
+                        "example": "user-123"
+                      },
+                      "tenantId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+                        "description": "External tenant that owns and pays for the order. Required for every product so user-api can verify tenant membership.",
+                        "example": "tenant-123"
+                      },
+                      "orderType": {
+                        "type": "string",
+                        "enum": [
+                          "SUBSCRIPTION",
+                          "BOOSTER_PACK",
+                          "RECHARGE"
+                        ],
+                        "default": "SUBSCRIPTION",
+                        "description": "Purchase type. Exactly one matching target field is required; target fields for other order types are rejected.",
+                        "example": "SUBSCRIPTION"
+                      },
+                      "planId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z0-9_-]+$",
+                        "description": "Required and only allowed when orderType is SUBSCRIPTION.",
+                        "example": "plan-pro"
+                      },
+                      "boosterPackId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Required and only allowed when orderType is BOOSTER_PACK.",
+                        "example": "6ff92714-a7e3-4554-b0d0-a9eae3e9a39e"
+                      },
+                      "amountCents": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483600,
+                        "description": "Required and only allowed for RECHARGE. Amount in the smallest currency unit; capped below the signed 32-bit database boundary.",
+                        "example": 5000
+                      },
+                      "idempotencyKey": {
+                        "type": "string",
+                        "minLength": 8,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z0-9._:-]+$",
+                        "description": "Required caller-generated idempotency key. Reuse it for every retry of the same logical order.",
+                        "example": "saas-order-10001"
+                      },
+                      "channel": {
+                        "type": "string",
+                        "enum": [
+                          "WECHAT",
+                          "ALIPAY",
+                          "STRIPE"
+                        ],
+                        "description": "Payment channel. Availability depends on order type and deployment configuration.",
+                        "example": "STRIPE"
+                      },
+                      "billingPeriod": {
+                        "type": "string",
+                        "enum": [
+                          "monthly",
+                          "quarterly",
+                          "yearly"
+                        ],
+                        "description": "Optional only for SUBSCRIPTION; omission means monthly.",
+                        "example": "monthly"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z]{3}$",
+                        "description": "Three-letter ISO 4217 currency code.",
+                        "example": "usd"
+                      },
+                      "successUrl": {
+                        "type": "string",
+                        "format": "uri",
+                        "pattern": "^https?:\\/\\/",
+                        "description": "Browser redirect after successful payment. Allowed for STRIPE and ALIPAY only; its origin must be allowlisted for the product.",
+                        "example": "https://app.saas.example/billing/success"
+                      },
+                      "cancelUrl": {
+                        "type": "string",
+                        "format": "uri",
+                        "pattern": "^https?:\\/\\/",
+                        "description": "Browser redirect after cancelled payment. Allowed for STRIPE only; its origin must be allowlisted for the product.",
+                        "example": "https://app.saas.example/billing/cancel"
+                      }
+                    },
+                    "required": [
+                      "userId",
+                      "tenantId",
+                      "idempotencyKey",
+                      "channel"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "description": "Exactly one purchase target is allowed and it must match orderType.",
+                    "oneOf": [
+                      {
+                        "title": "Subscription order",
+                        "properties": {
+                          "orderType": {
+                            "type": "string",
+                            "enum": [
+                              "SUBSCRIPTION"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "planId"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "boosterPackId"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "amountCents"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Booster-pack order",
+                        "properties": {
+                          "orderType": {
+                            "type": "string",
+                            "enum": [
+                              "BOOSTER_PACK"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "orderType",
+                          "boosterPackId"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "planId"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "amountCents"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "billingPeriod"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Recharge order",
+                        "properties": {
+                          "orderType": {
+                            "type": "string",
+                            "enum": [
+                              "RECHARGE"
+                            ]
+                          },
+                          "amountCents": {
+                            "type": "integer",
+                            "multipleOf": 100
+                          }
+                        },
+                        "required": [
+                          "orderType",
+                          "amountCents"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "planId"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "boosterPackId"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "billingPeriod"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "description": "Browser callback fields are restricted by payment channel.",
+                    "oneOf": [
+                      {
+                        "title": "WeChat payment",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "enum": [
+                              "WECHAT"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "channel"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "successUrl"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "cancelUrl"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Alipay payment",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "enum": [
+                              "ALIPAY"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "channel"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "cancelUrl"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Stripe payment",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "enum": [
+                              "STRIPE"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "channel"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "request": {
+                  "value": {
+                    "userId": "user-123",
+                    "tenantId": "tenant-123",
+                    "orderType": "SUBSCRIPTION",
+                    "planId": "plan-pro",
+                    "channel": "ALIPAY",
+                    "billingPeriod": "monthly",
+                    "currency": "usd",
+                    "idempotencyKey": "saas-order-10001",
+                    "successUrl": "https://app.saas.example/billing/success"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCreatePaymentOrderResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "订单创建成功",
+                      "data": {
+                        "order": {
+                          "id": "order-123",
+                          "userId": "user-123",
+                          "tenantId": "tenant-123",
+                          "orderType": "SUBSCRIPTION",
+                          "bundleSkuId": null,
+                          "productId": "prod-123",
+                          "planId": "plan-pro",
+                          "boosterPackId": null,
+                          "amountCents": 1999,
+                          "rechargeTierId": null,
+                          "bonusCents": 0,
+                          "totalGrantedCents": 1999,
+                          "billingPeriod": "monthly",
+                          "prorationCreditCents": null,
+                          "status": "PENDING",
+                          "channel": "ALIPAY",
+                          "tradeNo": null,
+                          "paidAt": null,
+                          "refundedAt": null,
+                          "refundReason": null,
+                          "createdAt": "2026-07-23T08:00:00.000Z"
+                        },
+                        "payUrl": "https://openapi.alipay.com/gateway.do?example=1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/PartnerUpstreamError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/payment/orders": {
+      "get": {
+        "operationId": "partnerListPaymentOrders",
+        "summary": "List payment orders",
+        "description": "Returns paginated orders for the resolved subject and token-derived product.",
+        "tags": [
+          "Payment"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "One-based page number.",
+              "example": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Number of records per page, at most 100.",
+              "example": 20
+            },
+            "required": false,
+            "name": "pageSize",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "PAID",
+                "FULFILLING",
+                "PARTIALLY_FULFILLED_REQUIRES_COMPENSATION",
+                "COMPLETED",
+                "EXPIRED",
+                "CANCELLED",
+                "FAILED",
+                "REFUNDING",
+                "REFUNDED",
+                "REFUND_FAILED",
+                "REFUND_COMPENSATION_FAILED"
+              ],
+              "description": "Order status filter.",
+              "example": "PENDING"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SUBSCRIPTION",
+                "BOOSTER_PACK",
+                "RECHARGE",
+                "BUNDLE"
+              ],
+              "description": "Order type filter.",
+              "example": "SUBSCRIPTION"
+            },
+            "required": false,
+            "name": "orderType",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated payment orders.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetPaymentOrdersResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "items": [
+                          {
+                            "id": "order-123",
+                            "userId": "user-123",
+                            "tenantId": "tenant-123",
+                            "orderType": "SUBSCRIPTION",
+                            "bundleSkuId": null,
+                            "productId": "prod-123",
+                            "planId": "plan-pro",
+                            "boosterPackId": null,
+                            "amountCents": 1999,
+                            "rechargeTierId": null,
+                            "bonusCents": 0,
+                            "totalGrantedCents": 1999,
+                            "billingPeriod": "monthly",
+                            "prorationCreditCents": null,
+                            "status": "PENDING",
+                            "channel": "ALIPAY",
+                            "tradeNo": null,
+                            "paidAt": null,
+                            "refundedAt": null,
+                            "refundReason": null,
+                            "createdAt": "2026-07-23T08:00:00.000Z"
+                          }
+                        ],
+                        "total": 1,
+                        "page": 1,
+                        "pageSize": 20,
+                        "totalPages": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/payment/orders/{id}/status": {
+      "get": {
+        "operationId": "partnerGetPaymentOrderStatus",
+        "summary": "Get payment order status",
+        "description": "Returns a compact order status view suitable for payment polling.",
+        "tags": [
+          "Payment"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "Order identifier.",
+              "example": "order-123"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current order status.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetPaymentOrderStatusResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "status": "PENDING",
+                        "paidAt": null,
+                        "cancelReason": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/payment/orders/{id}": {
+      "get": {
+        "operationId": "partnerGetPaymentOrder",
+        "summary": "Get a payment order",
+        "description": "Returns full order details in the resolved subject and product scope.",
+        "tags": [
+          "Payment"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "Order identifier.",
+              "example": "order-123"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS user identifier mirrored into Billing.",
+              "example": "user-123"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+              "description": "External SaaS tenant identifier. It may be omitted only for a self-operated CODING_PLAN product whose subject is explicitly per-user.",
+              "example": "tenant-123"
+            },
+            "required": false,
+            "name": "tenantId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment order details.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetPaymentOrderResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "id": "order-123",
+                        "userId": "user-123",
+                        "tenantId": "tenant-123",
+                        "orderType": "SUBSCRIPTION",
+                        "bundleSkuId": null,
+                        "productId": "prod-123",
+                        "planId": "plan-pro",
+                        "boosterPackId": null,
+                        "amountCents": 1999,
+                        "rechargeTierId": null,
+                        "bonusCents": 0,
+                        "totalGrantedCents": 1999,
+                        "billingPeriod": "monthly",
+                        "prorationCreditCents": null,
+                        "status": "COMPLETED",
+                        "channel": "ALIPAY",
+                        "tradeNo": null,
+                        "paidAt": "2026-07-23T08:05:00.000Z",
+                        "refundedAt": null,
+                        "refundReason": null,
+                        "createdAt": "2026-07-23T08:00:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/payment/methods": {
+      "get": {
+        "operationId": "partnerListPaymentMethods",
+        "summary": "List available payment methods",
+        "description": "Returns configured methods for the token-derived product, order type, and platform currency.",
+        "tags": [
+          "Payment"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SUBSCRIPTION",
+                "BOOSTER_PACK",
+                "RECHARGE"
+              ],
+              "default": "SUBSCRIPTION",
+              "description": "Order type whose configured methods should be returned.",
+              "example": "SUBSCRIPTION"
+            },
+            "required": false,
+            "name": "orderType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "description": "Three-letter ISO 4217 currency code.",
+              "example": "usd"
+            },
+            "required": false,
+            "name": "currency",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available payment methods.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerGetPaymentMethodsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "methods": [
+                          {
+                            "channel": "STRIPE",
+                            "label": "银行卡",
+                            "currency": "usd",
+                            "mode": "redirect"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/partner/v1/tenants/provision": {
+      "post": {
+        "operationId": "partnerProvisionTenant",
+        "summary": "Provision a product tenant",
+        "description": "Mirrors the external subject, establishes product entitlement state, and creates or reuses a virtual API key. The idempotency key is scoped to the token-derived product; exact replays return the durable receipt, while a different normalized request with the same key returns HTTP 409. tenant.id is required except for a self-operated CODING_PLAN product whose subject is explicitly per-user. PAY_AS_YOU_GO and provider_resale CODING_PLAN never create a free entitlement through this operation; unknown Coding fulfillment modes fail closed.",
+        "tags": [
+          "Provisioning"
+        ],
+        "security": [
+          {
+            "partnerBearer": []
+          },
+          {
+            "productToken": []
+          },
+          {
+            "billingProductToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Provisioning snapshot. Product identity is derived exclusively from the integration token.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z0-9._:-]+$",
+                    "description": "Required caller-generated idempotency key, scoped to the token-derived product. Retry the same normalized request with the same key; reusing it for a different request returns HTTP 409.",
+                    "example": "provision:tenant-10001"
+                  },
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+                        "description": "External SaaS user identifier.",
+                        "example": "user-123"
+                      },
+                      "email": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 320,
+                        "format": "email",
+                        "description": "Latest email snapshot.",
+                        "example": "alice@example.com"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "nullable": true,
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "description": "Latest phone snapshot.",
+                        "example": "+8613800000000"
+                      },
+                      "nickname": {
+                        "type": "string",
+                        "nullable": true,
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Latest display-name snapshot.",
+                        "example": "Alice"
+                      },
+                      "sourceUpdatedAt": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "date-time",
+                        "description": "Version timestamp of the external user snapshot. It must not be more than five minutes in the future.",
+                        "example": "2026-07-23T08:00:00.000Z"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tenant": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "nullable": true,
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]*$",
+                        "description": "External SaaS tenant identifier. Required except for self-operated CODING_PLAN user-only products.",
+                        "example": "tenant-123"
+                      },
+                      "name": {
+                        "type": "string",
+                        "nullable": true,
+                        "minLength": 1,
+                        "maxLength": 200,
+                        "description": "Latest tenant display name.",
+                        "example": "Alice Team"
+                      },
+                      "type": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                          "personal",
+                          "team"
+                        ],
+                        "description": "Tenant type. Only personal and team are accepted.",
+                        "example": "personal"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "key": {
+                    "type": "object",
+                    "nullable": true,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "nullable": true,
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Virtual API key name. If supplied, it must equal the fixed product-scoped name saas:{token-derived-productSlug}:virtual.",
+                        "example": "saas:example-product:virtual"
+                      },
+                      "allowedModels": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "minItems": 1,
+                        "maxItems": 200,
+                        "description": "Optional model allowlist for the virtual API key. A non-null list must contain at least one model; an empty list is rejected rather than treated as unrestricted.",
+                        "example": [
+                          "gpt-4.1"
+                        ]
+                      },
+                      "budgetCents": {
+                        "type": "integer",
+                        "nullable": true,
+                        "minimum": 0,
+                        "exclusiveMinimum": true,
+                        "maximum": 100000000,
+                        "description": "Optional key budget in cents.",
+                        "example": 100000
+                      },
+                      "rotate": {
+                        "type": "boolean",
+                        "nullable": true,
+                        "description": "Rotate an existing Partner-managed key. Key policy changes require true. An exact replay with the same idempotency key returns the original durable result and never rotates again.",
+                        "example": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "ensureFreePlan": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "For SUBSCRIPTION and self-operated CODING_PLAN (platform_model_package), omission/null/true ensures the default/free entitlement and false skips it. For PAY_AS_YOU_GO and provider_resale CODING_PLAN, omission/null/false skips automatic entitlement creation (provider_resale requires an existing active entitlement) and true is rejected with HTTP 400. Unknown or unconfigured CODING_PLAN fulfillment modes fail closed.",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "idempotencyKey",
+                  "user"
+                ],
+                "additionalProperties": false
+              },
+              "examples": {
+                "request": {
+                  "value": {
+                    "idempotencyKey": "provision:tenant-10001",
+                    "user": {
+                      "id": "user-123",
+                      "email": "alice@example.com",
+                      "nickname": "Alice",
+                      "sourceUpdatedAt": "2026-07-23T08:00:00.000Z"
+                    },
+                    "tenant": {
+                      "id": "tenant-123",
+                      "name": "Alice Team",
+                      "type": "personal"
+                    },
+                    "ensureFreePlan": true,
+                    "key": {
+                      "allowedModels": [
+                        "gpt-4.1"
+                      ],
+                      "budgetCents": 100000,
+                      "rotate": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tenant provisioned. A newly generated secret is recoverable on exact replays for at most 15 minutes.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Always private, no-store. Partner responses must not be stored by browser or shared caches.",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                },
+                "example": "private, no-store"
+              },
+              "Vary": {
+                "description": "Includes Authorization, x-product-token, and x-billing-product-token to isolate credential-derived product state.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Authorization, x-product-token, x-billing-product-token"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerProvisionResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 0,
+                      "message": "ok",
+                      "data": {
+                        "userId": "user-123",
+                        "tenantId": "tenant-123",
+                        "productId": "prod-123",
+                        "productSlug": "example-product",
+                        "apiKey": {
+                          "id": "key-123",
+                          "prefix": "rk-12345678",
+                          "plainKey": "rk-full-key-returned-once",
+                          "created": true,
+                          "rotated": false
+                        },
+                        "subscription": {
+                          "id": "subscription-123",
+                          "planId": "plan-pro",
+                          "created": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/PartnerBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/PartnerUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/PartnerForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/PartnerNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PartnerConflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PartnerPayloadTooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/PartnerUnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/PartnerRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/PartnerInternalError"
+          },
+          "502": {
+            "$ref": "#/components/responses/PartnerUpstreamError"
+          },
+          "503": {
+            "$ref": "#/components/responses/PartnerServiceUnavailable"
+          }
+        }
+      }
+    }
+  }
+}

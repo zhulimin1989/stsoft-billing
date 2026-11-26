@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1.7
+FROM node:22-alpine
+# 国内构建:corepack 拉 pnpm 本体、pnpm/npx 拉依赖走 npmmirror;
+# prisma 引擎二进制走 npmmirror 的 prisma binary 镜像,避开 binaries.prisma.sh 跨境慢。
+# @raytone-lab scope 仍由 .npmrc 指向 GitHub Packages(用 github_token secret),
+# npm_config_registry 只改默认源,不影响 scope 级路由。
+# 海外构建仍用 Dockerfile(默认 npmjs + 官方 prisma 引擎源)。
+ENV COREPACK_NPM_REGISTRY=https://registry.npmmirror.com \
+    npm_config_registry=https://registry.npmmirror.com \
+    PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
+RUN apk add --no-cache ca-certificates
+RUN corepack enable && corepack prepare pnpm@10 --activate
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY packages/shared/package.json packages/shared/
+COPY apps/api/package.json apps/api/
+# pnpm-lock 用 file:vendor/...tgz 引用本地 vendored 包,install 前必须就位(否则 frozen-lockfile 解析 file: 失败 exit 254)
+COPY vendor vendor
+RUN --mount=type=secret,id=github_token \
+  GITHUB_TOKEN="$(cat /run/secrets/github_token)" pnpm install --frozen-lockfile --prod=false
+COPY packages/shared packages/shared
+COPY apps/api apps/api
+RUN cd apps/api && npx prisma generate
+RUN pnpm --filter @ruidong/shared build
+RUN pnpm --filter @ruidong/api build
+RUN chown -R node:node /app
+USER node
+WORKDIR /app/apps/api
+EXPOSE 3010
+CMD ["node", "dist/billing-main.js"]

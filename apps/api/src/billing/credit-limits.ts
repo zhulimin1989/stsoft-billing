@@ -1,0 +1,1 @@
+export const MAX_MANUAL_CREDIT_GRANT = 10_000;

@@ -1,0 +1,57 @@
+{
+  "event_type": "usage",
+  "version": "v2",
+  "event_id": "usage-evt-contract-001",
+  "request_id": "req-contract-usage-v2-001",
+  "ts": 1770539415123456789,
+  "key_id": "key-contract-001",
+  "api_key_id": "key-contract-001",
+  "tenant_id": "tenant-top-level",
+  "user_id": "user-contract-001",
+  "labels": {
+    "tenant_id": "tenant-contract-001",
+    "user_id": "user-contract-001",
+    "usr.product_id": "prod-payg",
+    "usr.product_slug": "payg",
+    "region": "us-east-1"
+  },
+  "call_type": "chat",
+  "model": "gpt-4o",
+  "provider": "openai",
+  "upstream_model": "gpt-4o-2024-08-06",
+  "resolved_api_type": "openai",
+  "prompt_tokens": 1000,
+  "completion_tokens": 525,
+  "total_tokens": 1525,
+  "token_source": "provider",
+  "producer_build_sha": "0123456789abcdef0123456789abcdef01234567",
+  "provider_usage_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "provider_account_ref": "provider-account-contract-001",
+  "stream_end_reason": "normal_end",
+  "usage_evidence": {
+    "source": "provider_terminal",
+    "status": "complete",
+    "protocol": "openai_sse",
+    "terminal_frame_seen": true,
+    "dimensions_present": [
+      "input_tokens",
+      "output_tokens",
+      "cache_read_input_tokens",
+      "cache_creation_input_tokens"
+    ]
+  },
+  "provider_reconciliation_required": false,
+  "provider_credential_ref": "provider-account-contract-001",
+  "upstream_request_id": "upstream-request-contract-001",
+  "upstream_response_id": "upstream-response-contract-001",
+  "token_extras": {
+    "cached_tokens": 100,
+    "cache_creation_input_tokens": 50,
+    "reasoning_tokens": 25
+  },
+  "quota_settlement": "settled",
+  "status": "success",
+  "status_code": 200,
+  "start_time": 1770539415000000000,
+  "end_time": 1770539415123456789
+}

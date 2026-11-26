@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source": "ARCH-PASSTHROUGH-REDESIGN.md v2 section 5 Batch 0",
+  "architecture_review": "ARCH-REVIEW-APPROVED capability-axis-freeze 2026-06-20 sha256:d40b3fe13f8ac5bbb4fac054e12ffdb87976d3abddda01ea5cdba6c8afd82fa2",
+  "model_config_axis_fields": [
+    "requestParamPolicy"
+  ],
+  "capability_override_fields": [],
+  "publisher_route_policy_axis_fields": [],
+  "prisma_capability_axis_fields": [
+    "CodingPlanProviderLine.capabilities",
+    "ModelPricing.supportedFeatures"
+  ]
+}

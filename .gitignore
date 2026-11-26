@@ -1,0 +1,81 @@
+# === Superpowers brainstorm sessions (Visual Companion) ===
+.superpowers/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# === IDE / Editor ===
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Logs ===
+/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# === Misc ===
+*.bak
+*.tmp
+*.temp
+
+# === Dependencies ===
+node_modules/
+.pnp/
+.pnp.js
+
+# === Build output ===
+dist/
+build/
+out/
+.next/
+/var/finance-exports/
+
+# === Testing ===
+coverage/
+
+# === Cache ===
+.cache/
+.vite/
+.turbo/
+.npm-cache/
+*.tsbuildinfo
+
+# === Database ===
+*.sqlite
+*.sqlite3
+
+# === Prisma ===
+prisma/migrations/*.sql.bak
+
+# === Docker ===
+.docker/
+
+# === Reference repos (not part of project) ===
+_reference/
+
+# === Firecrawl cache ===
+.firecrawl/
+.gstack/
+
+# === Tool session state ===
+.context/
+.claude/
+
+# === Playwright/Test artifacts ===
+test-results/
+playwright-report/

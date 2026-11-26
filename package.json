@@ -1,0 +1,39 @@
+{
+  "name": "codesphere-billing",
+  "private": true,
+  "description": "Codesphere standalone billing service.",
+  "scripts": {
+    "dev": "pnpm --filter @ruidong/api dev:billing",
+    "prepare:api": "pnpm --filter @ruidong/api prisma:generate",
+    "prepare:shared": "pnpm --filter @ruidong/shared build",
+    "build": "pnpm prepare:api && pnpm prepare:shared && pnpm --filter @ruidong/api build",
+    "start": "pnpm --filter @ruidong/api start:billing",
+    "start:openapi": "pnpm --filter @ruidong/api start:openapi",
+    "db-boundary:check": "node scripts/check-db-boundaries.mjs",
+    "migration:lock-timeout:check": "node scripts/check-migration-lock-timeout.mjs",
+    "migration:lock-timeout:baseline": "node scripts/check-migration-lock-timeout.mjs --write-baseline",
+    "capability-axis-freeze:check": "node scripts/check-capability-axis-freeze.mjs",
+    "typecheck": "pnpm db-boundary:check && pnpm migration:lock-timeout:check && pnpm prepare:api && pnpm prepare:shared && pnpm --filter @ruidong/shared typecheck && pnpm --filter @ruidong/api typecheck",
+    "test": "pnpm prepare:api && pnpm prepare:shared && pnpm --filter @ruidong/api test",
+    "test:e2e": "pnpm --filter @ruidong/e2e test",
+    "publisher:check-contracts": "pnpm --filter @ruidong/api publisher:check-contracts",
+    "publisher:intent-it": "pnpm --filter @ruidong/api publisher:intent-it",
+    "publisher:account-readiness": "pnpm --filter @ruidong/api publisher:account-readiness",
+    "provider-accounts:backfill": "pnpm --filter @ruidong/api provider-accounts:backfill",
+    "openapi:generate": "pnpm --filter @ruidong/api openapi:generate",
+    "openapi:check": "pnpm --filter @ruidong/api openapi:check",
+    "db:migrate:deploy": "pnpm --filter @ruidong/api prisma:migrate:billing",
+    "db:migrate:prod": "pnpm --filter @ruidong/api prisma:migrate:prod",
+    "prisma:generate": "pnpm --filter @ruidong/api prisma:generate",
+    "billing:load-test-deduct": "tsx scripts/load-test-deduct.ts",
+    "clean": "pnpm -r run clean"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}
