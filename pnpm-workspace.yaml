@@ -2,3 +2,13 @@ packages:
   - 'apps/api'
   - 'apps/e2e'
   - 'packages/shared'
+allowBuilds:
+  '@alicloud/openapi-core': true
+  '@nestjs/core': false
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  '@sentry-internal/node-cpu-profiler': true
+  esbuild: true
+  msgpackr-extract: true
+  prisma: true
